@@ -104,6 +104,7 @@
 {% block content %}
 {% block content_header %}
 {{ draw_widgets(file, 'header') }}
+<a href="{{ url_for('browse', path=file.urlpath) }}" class="button">Browse All Files</a>
 {% endblock %}
 
 {% block content_table %}
@@ -121,7 +122,7 @@
         </thead>
     </table>
     <div class="container">
-      {% for f in file.listdir(sortkey=sort_fnc, reverse=sort_reverse) %}
+      {% for f in file.listdir(sortkey=sort_fnc, reverse=sort_reverse, only_show_media=True) %}
           <div class="box">
               {% if f.link %}
                 {{ draw_widget(f, f.link) }}

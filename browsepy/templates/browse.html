@@ -94,6 +94,7 @@
 {% block content %}
 {% block content_header %}
 {{ draw_widgets(file, 'header') }}
+<a href="{{ url_for('gallery', path=file.urlpath) }}" class="button">Gallery View</a>
 {% endblock %}
 
 {% block content_table %}
