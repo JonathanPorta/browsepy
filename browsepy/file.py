@@ -464,6 +464,7 @@ class Directory(Node):
       will always return instances of this class.
     '''
     _listdir_cache = None
+    _listdir_media_cache = None
     mimetype = 'inode/directory'
     is_file = False
     size = None
@@ -662,7 +663,7 @@ class Directory(Node):
             new_filename = alternative_filename(filename)
         return new_filename
 
-    def _listdir(self, precomputed_stats=(os.name == 'nt'), only_show_media=True):
+    def _listdir(self, precomputed_stats=(os.name == 'nt'), only_show_media=False):
         '''
         Iter unsorted entries on this directory.
 
@@ -686,18 +687,26 @@ class Directory(Node):
             except OSError as e:
                 logger.exception(e)
 
-    def listdir(self, sortkey=None, reverse=False, only_show_media=True):
+    def listdir(self, sortkey=None, reverse=False, only_show_media=False):
         '''
         Get sorted list (by given sortkey and reverse params) of File objects.
 
         :return: sorted list of File instances
         :rtype: list of File instances
         '''
-        if self._listdir_cache is None:
-            self._listdir_cache = tuple(self._listdir(only_show_media=only_show_media))
+        if only_show_media:
+            if self._listdir_media_cache is None:
+                self._listdir_media_cache = tuple(
+                    self._listdir(only_show_media=True)
+                )
+            cache = self._listdir_media_cache
+        else:
+            if self._listdir_cache is None:
+                self._listdir_cache = tuple(self._listdir(only_show_media=False))
+            cache = self._listdir_cache
         if sortkey:
-            return sorted(self._listdir_cache, key=sortkey, reverse=reverse)
-        data = list(self._listdir_cache)
+            return sorted(cache, key=sortkey, reverse=reverse)
+        data = list(cache)
         if reverse:
             data.reverse()
         return data
@@ -956,7 +965,7 @@ def alternative_filename(filename, attempt=None):
 def myExclude(path, only_show_media):
     #print("Judge the path '{}' for ex/inclusion...".format(path))
     if not only_show_media:
-    	return False #temporariy show evertying. Need to make this a parameter
+        return False
     #iif os.path.isdir(path):
     #    return False
 

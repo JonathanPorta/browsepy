@@ -104,6 +104,7 @@
 {% block content %}
 {% block content_header %}
 {{ draw_widgets(file, 'header') }}
+<a href="{{ url_for('browse', path=file.urlpath) }}" class="button">Browse All Files</a>
 {% endblock %}
 
 {% block content_table %}
